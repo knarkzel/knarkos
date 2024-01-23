@@ -20,7 +20,7 @@ jobs:
 
       - name: Determine commit hash
         id: commit_hash
-        run: echo "::set-output name=commit_hash::$(git rev-parse HEAD)"
+        run: echo "::set-output name=commit_hash::$(git rev-parse --short HEAD)"
 
       - name: Create release
         id: create_release
