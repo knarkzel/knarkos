@@ -18,14 +18,18 @@ jobs:
       - name: Build knarkos
         run: nix develop --command cargo build --release
 
+      - name: Determine commit hash
+        id: commit_hash
+        run: echo "::set-output name=commit_hash::$(git rev-parse HEAD)"
+
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
-          release_name: Release ${{ github.sha }}
+          tag_name: ${{ steps.commit_hash.outputs.commit_hash }}
+          release_name: Release ${{ steps.commit_hash.outputs.commit_hash }}
           draft: false
           prerelease: false
 
@@ -34,5 +38,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: target/x86_64-knarkos/release/knarkos
-          asset_name: knarkos_${{ github.sha }}
+          asset_name: knarkos
           asset_content_type: application/octet-stream
