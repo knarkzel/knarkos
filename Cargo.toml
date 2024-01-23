@@ -3,14 +3,20 @@ name = "knarkos"
 version = "0.1.0"
 edition = "2021"
 
-[profile.dev]
-panic = "abort"
-
 [profile.release]
 panic = "abort"
 
 [dependencies]
 spin = "0.9.8"
+x86_64 = "0.14.2"
 volatile = "0.2.6"
+uart_16550 = "0.2.0"
 bootloader = "0.9.23"
 lazy_static = { version = "1.0", features = ["spin_no_std"] }
+
+[package.metadata.bootimage]
+test-success-exit-code = 33
+test-args = [
+  "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio",
+  "-display", "none"
+]
