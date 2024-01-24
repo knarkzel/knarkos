@@ -9,15 +9,15 @@ cargo run
 
 ## Goals
 
+- Not based on Unix
 - Simplicity from Plan9
 - Written in Rust for safety & performance
 - Emacs as a complete OS, everything powered by Lisp
 - Network of Lisp-powered machines, bee-hive concept
-- Not based on Unix
 
 ## Features
 
 - [ ] 2D graphics
 - [ ] Networking
-- [ ] Lisp JIT interpreter
+- [ ] Lisp bytecode VM
 - [ ] Hot reloading everywhere
