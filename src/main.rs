@@ -4,6 +4,7 @@
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+mod init;
 mod vga;
 mod serial;
 
@@ -11,6 +12,9 @@ mod serial;
 pub extern "C" fn _start() -> ! {
     #[cfg(test)]
     test_main();
+
+    // Run main
+    init::main();
     
     loop {}
 }

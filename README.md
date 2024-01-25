@@ -11,6 +11,7 @@ cargo run
 
 - Not based on Unix
 - Simplicity from Plan9
+- Reproducable OS like NixOS?
 - Written in Rust for safety & performance
 - Emacs as a complete OS, everything powered by Lisp
 - Network of Lisp-powered machines, bee-hive concept
