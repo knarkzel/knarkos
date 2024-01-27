@@ -1,5 +1,10 @@
 # knarkos
 
+What if Emacs was the entire operating system, written in a modern
+programming language? Basically the entire operating system is a lisp-runtime
+that runs `.lisp` files and compiles them to bytecode. Everything else can built
+on top of this.
+
 ```bash
 git clone https://github.com/knarkzel/knarkos
 cd knarkos/
@@ -22,3 +27,7 @@ cargo run
 - [ ] Networking
 - [ ] Lisp bytecode VM
 - [ ] Hot reloading everywhere
+
+## Resources
+
+- [Compiling a Lisp](https://bernsteinbear.com/blog/compiling-a-lisp-1/)
