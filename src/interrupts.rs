@@ -1,4 +1,4 @@
-use crate::{gdt, println, print};
+use crate::{gdt, print, println};
 use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
@@ -30,12 +30,11 @@ lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
-        idt[InterruptIndex::Timer.as_usize()]
-        .set_handler_fn(timer_interrupt_handler);
-        idt[InterruptIndex::Keyboard.as_usize()]
-            .set_handler_fn(keyboard_interrupt_handler);
+        idt[InterruptIndex::Timer.as_usize()].set_handler_fn(timer_interrupt_handler);
+        idt[InterruptIndex::Keyboard.as_usize()].set_handler_fn(keyboard_interrupt_handler);
         unsafe {
-            idt.double_fault.set_handler_fn(double_fault_handler)
+            idt.double_fault
+                .set_handler_fn(double_fault_handler)
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
         }
         idt
@@ -63,26 +62,22 @@ extern "x86-interrupt" fn double_fault_handler(
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn timer_interrupt_handler(
-    _stack_frame: InterruptStackFrame)
-{
+extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
     // print!(".");
     unsafe {
-        PICS.lock().notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
 }
 
-extern "x86-interrupt" fn keyboard_interrupt_handler(
-    _stack_frame: InterruptStackFrame)
-{
+extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStackFrame) {
     use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
     use spin::Mutex;
     use x86_64::instructions::port::Port;
 
     lazy_static! {
-        static ref KEYBOARD: Mutex<Keyboard<layouts::Colemak, ScancodeSet1>> =
-        Mutex::new(Keyboard::new(ScancodeSet1::new(), layouts::Colemak,
-            HandleControl::Ignore)
+        static ref KEYBOARD: Mutex<Keyboard<layouts::Colemak, ScancodeSet1>> = Mutex::new(
+            Keyboard::new(ScancodeSet1::new(), layouts::Colemak, HandleControl::Ignore)
         );
     }
 
@@ -97,7 +92,7 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(
                 DecodedKey::RawKey(key) => {
                     // Delete key should go backwards
                     // print!("{:?}", key);
-                },
+                }
             }
         }
     }
