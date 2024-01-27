@@ -8,9 +8,11 @@
 pub mod vga;
 pub mod serial;
 pub mod interrupts;
+pub mod gdt;
 
 pub fn init() {
-    interrupts::init_idt();
+    gdt::init();
+    interrupts::init();
 }
 
 /// Entry point for `cargo test`

@@ -9,10 +9,9 @@ use core::panic::PanicInfo;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    println!("Hello World!");
-
+    // Initialize operating system
     knarkos::init();
-    x86_64::instructions::interrupts::int3();
+    println!("Hello, world!");
     
     #[cfg(test)]
     test_main();
