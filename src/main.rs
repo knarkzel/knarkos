@@ -5,30 +5,29 @@
 #![reexport_test_harness_main = "test_main"]
 
 use knarkos::println;
-use core::panic::PanicInfo;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     // Initialize operating system
     knarkos::init();
     println!("Hello, world!");
-    
+
     #[cfg(test)]
     test_main();
 
-    loop {}
+    knarkos::hlt_loop();
 }
 
 /// This function is called on panic.
 #[cfg(not(test))]
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
+fn panic(info: &core::panic::PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    knarkos::hlt_loop();
 }
 
 #[cfg(test)]
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
+fn panic(info: &core::panic::PanicInfo) -> ! {
     knarkos::test_panic_handler(info)
 }
