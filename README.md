@@ -10,8 +10,7 @@ because the operating system itself is the runtime.
 git clone https://github.com/knarkzel/knarkos
 cd knarkos 
 nix develop # or nix-shell
-cd os/
-cargo run
+just build
 ```
 
 ## Goals
