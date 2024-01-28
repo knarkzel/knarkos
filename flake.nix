@@ -26,6 +26,7 @@
           buildInputs = [
             rust
             qemu
+            just
             cargo-bootimage
           ];
         };

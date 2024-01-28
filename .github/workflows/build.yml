@@ -16,7 +16,7 @@ jobs:
         uses: cachix/install-nix-action@v18
 
       - name: Build knarkos
-        run: nix develop --command cargo build --release
+        run: nix develop --command just build
 
       - name: Determine commit hash
         id: commit_hash
@@ -39,6 +39,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/x86_64-knarkos/release/knarkos
-          asset_name: knarkos
+          asset_path: knarkos.elf
+          asset_name: knarkos.elf
           asset_content_type: application/octet-stream

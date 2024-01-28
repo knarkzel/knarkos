@@ -8,8 +8,9 @@ because the operating system itself is the runtime.
 
 ```bash
 git clone https://github.com/knarkzel/knarkos
-cd knarkos/
+cd knarkos 
 nix develop # or nix-shell
+cd os/
 cargo run
 ```
 
