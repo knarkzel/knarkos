@@ -5,10 +5,14 @@
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+#[cfg(test)]
+use bootloader::{entry_point, BootInfo};
+
 pub mod gdt;
 pub mod interrupts;
 pub mod serial;
 pub mod vga;
+pub mod memory;
 
 pub fn init() {
     gdt::init();
@@ -25,11 +29,14 @@ pub fn hlt_loop() -> ! {
 
 /// Entry point for `cargo test`
 #[cfg(test)]
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+entry_point!(test_kernel_main);
+
+#[cfg(test)]
+fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
+    // like before
     init();
     test_main();
-    crate::hlt_loop()
+    hlt_loop();
 }
 
 // Boilerplate for testing

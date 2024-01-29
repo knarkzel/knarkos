@@ -12,10 +12,10 @@ spin = "0.9.8"
 x86_64 = "0.14.2"
 volatile = "0.2.6"
 uart_16550 = "0.2.0"
-bootloader = "0.9.23"
 pic8259 = "0.10.4"
 pc-keyboard = "0.7.0"
 lazy_static = { version = "1.0", features = ["spin_no_std"] }
+bootloader = { version = "0.9.23", features = ["map_physical_memory"]}
 
 [package.metadata.bootimage]
 test-success-exit-code = 33
