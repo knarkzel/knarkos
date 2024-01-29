@@ -32,3 +32,4 @@ just build
 ## Resources
 
 - [Compiling a Lisp](https://bernsteinbear.com/blog/compiling-a-lisp-1/)
+- [Bytecode interpreters](https://bernsteinbear.com/blog/bytecode-interpreters/)
