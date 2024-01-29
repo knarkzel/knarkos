@@ -1,11 +1,7 @@
-use lisp::parse_expr;
+use lisp::{parse_expr, VirtualMachine};
 
 fn main() {
-    match parse_expr("(+ 1 2 3)") {
-        Ok((_, success)) => {
-            println!("Parsed following: {success}");
-            println!("{success:#?}");
-        }
-        Err(error) => eprintln!("Got error: {error:?}"),
-    }
+    let (_, ast) = parse_expr("(+ 1 2 3)").unwrap();
+    let vm = VirtualMachine::new(&[ast]);
+    dbg!(&vm);
 }
