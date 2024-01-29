@@ -8,6 +8,7 @@ pub enum Instruction {
 
 #[derive(Debug, Clone)]
 pub struct VirtualMachine {
+    stack: Vec<usize>,
     code: Vec<Instruction>,
 }
 
@@ -45,6 +46,29 @@ impl VirtualMachine {
                 _ => panic!("Invalid expression: {expr}"),
             }
         }
-        Self { code }
+        Self {
+            code,
+            stack: Vec::new(),
+        }
+    }
+
+    pub fn run(&mut self) -> Option<usize> {
+        self.stack = Vec::new();
+        for instruction in &self.code {
+            match instruction {
+                Instruction::Add => {
+                    if let (Some(a), Some(b)) = (self.stack.pop(), self.stack.pop()) {
+                        let output = a + b;
+                        self.stack.push(output);
+                    } else {
+                        panic!("Stack underflow");
+                    }
+                },
+                Instruction::Push(number) => {
+                    self.stack.push(*number);
+                },
+            }
+        }
+        self.stack.pop()
     }
 }
