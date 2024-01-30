@@ -6,7 +6,7 @@
 
 extern crate alloc;
 
-use knarkos::{println, repl};
+use knarkos::println;
 use bootloader::{BootInfo, entry_point};
 
 entry_point!(kernel_main);
@@ -30,10 +30,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
-    // Run repl
-    #[cfg(not(test))]
-    repl::main();
-    
     knarkos::hlt_loop();
 }
 

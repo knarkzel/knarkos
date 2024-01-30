@@ -16,7 +16,6 @@ pub mod serial;
 pub mod vga;
 pub mod memory;
 pub mod allocator;
-pub mod repl;
 
 pub fn init() {
     vga::init();

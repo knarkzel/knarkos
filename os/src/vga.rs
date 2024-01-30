@@ -8,13 +8,14 @@ lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         row: 0,
         column: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        color_code: ColorCode::new(Color::White, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     });
 }
 
 pub fn init() {
-    WRITER.lock().enable_cursor(0, 16);
+    let mut vga = WRITER.lock();
+    vga.write_prompt();
 }
 
 // Abstractions for color
@@ -60,6 +61,7 @@ struct ScreenChar {
 // Setup buffer
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
+const PROMPT_LENGTH: usize = 10;
 
 #[repr(transparent)]
 struct Buffer {
@@ -74,23 +76,14 @@ pub struct Writer {
 }
 
 impl Writer {
-    fn write_byte(&mut self, byte: u8) {
-        // Write the byte
-        match byte {
-            b'\n' => self.new_line(),
-            byte => {
-                if self.column >= BUFFER_WIDTH {
-                    self.new_line();
-                }
-                self.buffer.chars[self.row][self.column].write(ScreenChar {
-                    ascii_character: byte,
-                    color_code: self.color_code,
-                });
-                self.column += 1;
-            }
-        }
+    pub fn write_prompt(&mut self) {
+        self.color_code = ColorCode::new(Color::Green, Color::Black);
+        self.write_string("knarkos ");
+        self.color_code = ColorCode::new(Color::LightBlue, Color::Black);
+        self.write_string("> ");
+        self.color_code = ColorCode::new(Color::White, Color::Black);
     }
-
+    
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
@@ -103,6 +96,34 @@ impl Writer {
         self.move_cursor();
     }
 
+    pub fn delete_character(&mut self) {
+        if self.column > PROMPT_LENGTH {
+            self.column -= 1;
+            self.write_byte_to(b' ', self.row, self.column);
+        }
+    }
+
+    fn write_byte_to(&mut self, byte: u8, row: usize, column: usize) {
+        self.buffer.chars[row][column].write(ScreenChar {
+            ascii_character: byte,
+            color_code: self.color_code,
+        });
+    }
+    
+    fn write_byte(&mut self, byte: u8) {
+        // Write the byte
+        match byte {
+            b'\n' => self.new_line(),
+            byte => {
+                if self.column >= BUFFER_WIDTH {
+                    self.new_line();
+                }
+                self.write_byte_to(byte, self.row, self.column);
+                self.column += 1;
+            }
+        }
+    }
+
     fn move_cursor(&self) {
         // Move VGA cursor
         let position = self.row * BUFFER_WIDTH + self.column;
@@ -113,23 +134,6 @@ impl Writer {
             cursor_register.write((position & 0xFF) as u8);
             cursor_control.write(0x0E);
             cursor_register.write(((position >> 8) & 0xFF) as u8);
-        }
-    }
-
-    fn enable_cursor(&self, start: u8, end: u8) {
-        // Enable VGA cursor
-        let mut cursor_control = Port::<u8>::new(0x3D4);
-        let mut cursor_register = Port::<u8>::new(0x3D5);
-        unsafe {
-            // Setup start scanline
-            cursor_control.write(0x0A);
-            let scanline_start = cursor_register.read() & 0xC0;
-            cursor_register.write(scanline_start | start);
-
-            // Setup end scanline            
-            cursor_control.write(0x0B);
-            let scanline_end = cursor_register.read() & 0xE0;
-            cursor_register.write(scanline_end | end);
         }
     }
 
@@ -146,6 +150,7 @@ impl Writer {
             self.row += 1;
         }
         self.column = 0;
+        self.write_prompt();
     }
 
     fn clear_row(&mut self, row: usize) {

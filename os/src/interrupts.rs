@@ -1,5 +1,6 @@
-use crate::{gdt, print, println, hlt_loop};
+use crate::{gdt, print, println, hlt_loop, vga};
 use lazy_static::lazy_static;
+use pc_keyboard::KeyCode;
 use pic8259::ChainedPics;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
@@ -89,11 +90,13 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
     if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {
         if let Some(key) = keyboard.process_keyevent(key_event) {
             match key {
-                DecodedKey::Unicode(character) => print!("{}", character),
-                DecodedKey::RawKey(_key) => {
-                    // Delete key should go backwards
-                    // print!("{:?}", key);
-                }
+                DecodedKey::Unicode(character) if character == 0x8 as char => {
+                    // Get access to writer
+                    let mut vga = vga::WRITER.lock();
+                    vga.delete_character();
+                },
+                DecodedKey::Unicode(character) => print!("{character}"),
+                _ => {},
             }
         }
     }
