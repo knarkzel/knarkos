@@ -19,6 +19,7 @@ pub mod allocator;
 pub mod repl;
 
 pub fn init() {
+    vga::init();
     gdt::init();
     interrupts::init();
     unsafe { interrupts::PICS.lock().initialize() };

@@ -13,6 +13,10 @@ lazy_static! {
     });
 }
 
+pub fn init() {
+    WRITER.lock().enable_cursor(0, 16);
+}
+
 // Abstractions for color
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -70,7 +74,7 @@ pub struct Writer {
 }
 
 impl Writer {
-    pub fn write_byte(&mut self, byte: u8) {
+    fn write_byte(&mut self, byte: u8) {
         // Write the byte
         match byte {
             b'\n' => self.new_line(),
@@ -85,17 +89,6 @@ impl Writer {
                 self.column += 1;
             }
         }
-
-        // Move VGA cursor
-        let position = self.row * 80 + self.column;
-        let mut cursor_control = Port::<u8>::new(0x3D4);
-        let mut cursor_register = Port::<u8>::new(0x3D5);
-        unsafe {
-            cursor_control.write(0x0F);
-            cursor_register.write((position & 0xFF) as u8);
-            cursor_control.write(0x0E);
-            cursor_register.write(((position >> 8) & 0xFF) as u8);
-        }
     }
 
     pub fn write_string(&mut self, s: &str) {
@@ -106,6 +99,37 @@ impl Writer {
                 // not part of printable ASCII range
                 _ => self.write_byte(0xfe),
             }
+        }
+        self.move_cursor();
+    }
+
+    fn move_cursor(&self) {
+        // Move VGA cursor
+        let position = self.row * BUFFER_WIDTH + self.column;
+        let mut cursor_control = Port::<u8>::new(0x3D4);
+        let mut cursor_register = Port::<u8>::new(0x3D5);
+        unsafe {
+            cursor_control.write(0x0F);
+            cursor_register.write((position & 0xFF) as u8);
+            cursor_control.write(0x0E);
+            cursor_register.write(((position >> 8) & 0xFF) as u8);
+        }
+    }
+
+    fn enable_cursor(&self, start: u8, end: u8) {
+        // Enable VGA cursor
+        let mut cursor_control = Port::<u8>::new(0x3D4);
+        let mut cursor_register = Port::<u8>::new(0x3D5);
+        unsafe {
+            // Setup start scanline
+            cursor_control.write(0x0A);
+            let scanline_start = cursor_register.read() & 0xC0;
+            cursor_register.write(scanline_start | start);
+
+            // Setup end scanline            
+            cursor_control.write(0x0B);
+            let scanline_end = cursor_register.read() & 0xE0;
+            cursor_register.write(scanline_end | end);
         }
     }
 

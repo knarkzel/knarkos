@@ -12,9 +12,9 @@ use bootloader::{BootInfo, entry_point};
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use x86_64::VirtAddr;
     use knarkos::{memory, allocator};
     use knarkos::memory::BootInfoFrameAllocator;
-    use x86_64::VirtAddr;
     
     // Initialize operating system
     knarkos::init();
