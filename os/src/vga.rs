@@ -15,6 +15,7 @@ lazy_static! {
 
 pub fn init() {
     let mut vga = WRITER.lock();
+    vga.clear_screen();
     vga.write_prompt();
 }
 
@@ -151,6 +152,12 @@ impl Writer {
         }
         self.column = 0;
         self.write_prompt();
+    }
+
+    fn clear_screen(&mut self) {
+        for row in 0..BUFFER_HEIGHT {
+            self.clear_row(row);
+        }
     }
 
     fn clear_row(&mut self, row: usize) {
