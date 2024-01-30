@@ -1,3 +1,4 @@
+use alloc::{boxed::Box, vec::Vec, string::String, format};
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -8,7 +9,7 @@ use nom::{
     sequence::{delimited, tuple},
     Parser,
 };
-use std::fmt;
+use core::fmt;
 
 // Helpers
 type IResult<'a, T, E = error::Error<&'a str>> = nom::IResult<&'a str, T, E>;
@@ -59,7 +60,7 @@ pub enum Atom {
 }
 
 impl fmt::Display for Atom {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Number(number) => write!(f, "{number}"),
             Self::Operator(operator) => write!(f, "{operator}"),
@@ -98,7 +99,7 @@ pub enum Expr {
 }
 
 impl fmt::Display for Expr {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Constant(atom) => write!(f, "{atom}"),
             Self::Call(head, tail) => {

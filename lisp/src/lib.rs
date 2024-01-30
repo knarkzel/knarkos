@@ -1,3 +1,7 @@
+#![no_std]
+
+extern crate alloc;
+
 // Modules
 pub mod parse;
 pub mod compile;

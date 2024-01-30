@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use crate::{Atom, Expr, Operator};
 
 #[derive(Debug, Clone, Copy)]
