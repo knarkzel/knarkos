@@ -2,10 +2,7 @@ use crate::{Atom, Expr, Operator};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Instruction {
-    Add,
-    Subtract,
-    Divide,
-    Multiply,
+    Operator(Operator),
     Push(isize),
 }
 
@@ -38,12 +35,7 @@ impl VirtualMachine {
 
                 // Push (n - 1) function instruction
                 let instruction = match function.as_ref() {
-                    Expr::Constant(Atom::Operator(operator)) => match operator {
-                        Operator::Add => Instruction::Add,
-                        Operator::Subtract => Instruction::Subtract,
-                        Operator::Divide => Instruction::Divide,
-                        Operator::Multiply => Instruction::Multiply,
-                    },
+                    Expr::Constant(Atom::Operator(operator)) => Instruction::Operator(*operator),
                     _ => panic!("Invalid function: {function}"),
                 };
                 for _ in 0..args.len() - 1 {
@@ -71,14 +63,13 @@ impl VirtualMachine {
     pub fn run(mut self) -> Option<isize> {
         for instruction in &self.code {
             match instruction {
-                Instruction::Add | Instruction::Subtract | Instruction::Divide | Instruction::Multiply => {
+                Instruction::Operator(operator) => {
                     if let (Some(b), Some(a)) = (self.stack.pop(), self.stack.pop()) {
-                        let output = match instruction {
-                            Instruction::Add => a + b,
-                            Instruction::Subtract => a - b,
-                            Instruction::Divide => a / b,
-                            Instruction::Multiply => a * b,
-                            _ => panic!("Impossible branch")
+                        let output = match operator {
+                            Operator::Add => a + b,
+                            Operator::Subtract => a - b,
+                            Operator::Divide => a / b,
+                            Operator::Multiply => a * b,
                         };
                         self.stack.push(output);
                     } else {

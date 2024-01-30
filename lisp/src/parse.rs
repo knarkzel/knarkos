@@ -32,7 +32,7 @@ where
 }
 
 // Operator
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Operator {
     Add,
     Subtract,
