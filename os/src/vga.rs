@@ -2,6 +2,7 @@ use core::fmt;
 use lazy_static::lazy_static;
 use spin::Mutex;
 use volatile::Volatile;
+use x86_64::instructions::port::Port;
 
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
@@ -70,6 +71,7 @@ pub struct Writer {
 
 impl Writer {
     pub fn write_byte(&mut self, byte: u8) {
+        // Write the byte
         match byte {
             b'\n' => self.new_line(),
             byte => {
@@ -82,6 +84,17 @@ impl Writer {
                 });
                 self.column += 1;
             }
+        }
+
+        // Move VGA cursor
+        let position = self.row * 80 + self.column;
+        let mut cursor_control = Port::<u8>::new(0x3D4);
+        let mut cursor_register = Port::<u8>::new(0x3D5);
+        unsafe {
+            cursor_control.write(0x0F);
+            cursor_register.write((position & 0xFF) as u8);
+            cursor_control.write(0x0E);
+            cursor_register.write(((position >> 8) & 0xFF) as u8);
         }
     }
 
