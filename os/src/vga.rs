@@ -156,7 +156,6 @@ impl Writer {
             self.row += 1;
         }
         self.column = 0;
-        self.write_prompt();
     }
 
     fn clear_screen(&mut self) {

@@ -1,4 +1,4 @@
-use crate::{gdt, hlt_loop, print, println, vga};
+use crate::{gdt, hlt_loop, print, println, vga, repl};
 use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
@@ -94,7 +94,16 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
                     let mut vga = vga::WRITER.lock();
                     vga.delete_character();
                 }
-                DecodedKey::Unicode(character) => print!("{character}"),
+                DecodedKey::Unicode(character) => {
+                    if character == '\n' {
+                        repl::eval();
+                        let mut vga = vga::WRITER.lock();
+                        vga.write_prompt();
+                    } else {
+                        repl::push(character);
+                        print!("{character}");
+                    }
+                },
                 _ => {}
             }
         }
