@@ -105,6 +105,7 @@ impl Writer {
         if self.column > PROMPT_LENGTH {
             self.column -= 1;
             self.write_byte_to(b' ', self.row, self.column);
+            self.move_cursor();
         }
     }
 
