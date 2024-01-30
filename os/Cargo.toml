@@ -5,7 +5,6 @@ edition = "2021"
 
 [profile.release]
 panic = "abort"
-strip = true
 
 [dependencies]
 spin = "0.9.8"
