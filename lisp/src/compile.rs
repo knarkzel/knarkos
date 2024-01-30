@@ -3,12 +3,15 @@ use crate::{Atom, Expr, Operator};
 #[derive(Debug, Clone, Copy)]
 pub enum Instruction {
     Add,
-    Push(usize),
+    Subtract,
+    Divide,
+    Multiply,
+    Push(isize),
 }
 
 #[derive(Debug, Clone)]
 pub struct VirtualMachine {
-    stack: Vec<usize>,
+    stack: Vec<isize>,
     code: Vec<Instruction>,
 }
 
@@ -35,8 +38,11 @@ impl VirtualMachine {
 
                 // Push (n - 1) function instruction
                 let instruction = match function.as_ref() {
-                    Expr::Constant(Atom::Operator(Operator::Plus)) => {
-                        Instruction::Add
+                    Expr::Constant(Atom::Operator(operator)) => match operator {
+                        Operator::Add => Instruction::Add,
+                        Operator::Subtract => Instruction::Subtract,
+                        Operator::Divide => Instruction::Divide,
+                        Operator::Multiply => Instruction::Multiply,
                     },
                     _ => panic!("Invalid function: {function}"),
                 };
@@ -62,12 +68,18 @@ impl VirtualMachine {
         }
     }
     
-    pub fn run(mut self) -> Option<usize> {
+    pub fn run(mut self) -> Option<isize> {
         for instruction in &self.code {
             match instruction {
-                Instruction::Add => {
-                    if let (Some(a), Some(b)) = (self.stack.pop(), self.stack.pop()) {
-                        let output = a + b;
+                Instruction::Add | Instruction::Subtract | Instruction::Divide | Instruction::Multiply => {
+                    if let (Some(b), Some(a)) = (self.stack.pop(), self.stack.pop()) {
+                        let output = match instruction {
+                            Instruction::Add => a + b,
+                            Instruction::Subtract => a - b,
+                            Instruction::Divide => a / b,
+                            Instruction::Multiply => a * b,
+                            _ => panic!("Impossible branch")
+                        };
                         self.stack.push(output);
                     } else {
                         panic!("Stack underflow");

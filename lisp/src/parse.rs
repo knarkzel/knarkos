@@ -34,13 +34,19 @@ where
 // Operator
 #[derive(Debug)]
 pub enum Operator {
-    Plus,
+    Add,
+    Subtract,
+    Divide,
+    Multiply,
 }
 
 impl fmt::Display for Operator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Plus => write!(f, "+"),
+            Operator::Add => write!(f, "+"),
+            Operator::Subtract => write!(f, "-"),
+            Operator::Divide => write!(f, "/"),
+            Operator::Multiply => write!(f, "*"),
         }
     }
 }
@@ -48,7 +54,7 @@ impl fmt::Display for Operator {
 // Atoms
 #[derive(Debug)]
 pub enum Atom {
-    Number(usize),
+    Number(isize),
     Operator(Operator),
 }
 
@@ -64,7 +70,10 @@ impl fmt::Display for Atom {
 fn parse_operator(input: &str) -> IResult<Atom> {
     map(
         alt((
-            map(tag("+"), |_| Operator::Plus),
+            map(tag("+"), |_| Operator::Add),
+            map(tag("-"), |_| Operator::Subtract),
+            map(tag("/"), |_| Operator::Divide),
+            map(tag("*"), |_| Operator::Multiply),
         )),
         |operator| Atom::Operator(operator),
     )(input)
@@ -72,7 +81,7 @@ fn parse_operator(input: &str) -> IResult<Atom> {
 
 fn parse_number(input: &str) -> IResult<Atom> {
     map(digit1, |digits: &str| {
-        Atom::Number(digits.parse::<usize>().unwrap())
+        Atom::Number(digits.parse::<isize>().unwrap())
     })(input)
 }
 
