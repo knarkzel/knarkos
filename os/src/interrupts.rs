@@ -93,6 +93,7 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
                     // Get access to writer
                     let mut vga = vga::WRITER.lock();
                     vga.delete_character();
+                    repl::pop();
                 }
                 DecodedKey::Unicode(character) => {
                     if character == '\n' {
