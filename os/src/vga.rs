@@ -4,6 +4,8 @@ use spin::Mutex;
 use volatile::Volatile;
 use x86_64::instructions::port::Port;
 
+use crate::serial_println;
+
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         row: 0,
@@ -84,14 +86,16 @@ impl Writer {
         self.write_string("> ");
         self.color_code = ColorCode::new(Color::White, Color::Black);
     }
-    
+
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
                 // printable ASCII byte or newline
                 0x20..=0x7e | b'\n' => self.write_byte(byte),
                 // not part of printable ASCII range
-                _ => self.write_byte(0xfe),
+                _ => {
+                    serial_println!("Got invalid key: {byte}");
+                }
             }
         }
         self.move_cursor();
@@ -110,7 +114,7 @@ impl Writer {
             color_code: self.color_code,
         });
     }
-    
+
     fn write_byte(&mut self, byte: u8) {
         // Write the byte
         match byte {
