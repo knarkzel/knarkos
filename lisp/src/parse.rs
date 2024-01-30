@@ -5,7 +5,7 @@ use nom::{
     character::complete::{char, digit1, multispace0},
     combinator::map,
     error,
-    multi::many0,
+    multi::{many0, many1},
     sequence::{delimited, tuple},
     Parser,
 };
@@ -129,9 +129,9 @@ fn parse_expr(input: &str) -> IResult<Expr> {
 }
 
 pub fn parse(input: &str) -> Result<Vec<Expr>, String> {
-    match many0(parse_expr)(input) {
+    match many1(parse_expr)(input) {
         Ok((_, exprs)) => Ok(exprs),
-        Err(error) => Err(format!("Error occurred: {error}")),
+        Err(error) => Err(format!("{error}")),
     }
 }
 

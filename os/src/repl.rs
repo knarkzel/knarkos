@@ -11,18 +11,26 @@ lazy_static! {
 }
 
 pub fn push(character: char) {
-    let mut prompt = PROMPT.lock();
-    prompt.push(character);
+    match character as u8 {
+        0x20..=0x7e => {
+            let mut prompt = PROMPT.lock();
+            prompt.push(character);
+        }
+        _ => {}
+    }
 }
 
 pub fn eval() {
     let mut prompt = PROMPT.lock();
-    if let Ok(ast) = parse(prompt.as_str()) {
-        let vm = VirtualMachine::new(&ast);
-        match vm.run() {
-            Some(value) => println!("\n{value}"),
-            None => println!(),
-        }
+    match parse(prompt.as_str()) {
+        Ok(ast) => {
+            let vm = VirtualMachine::new(&ast);
+            match vm.run() {
+                Some(value) => println!("\n{value}"),
+                None => println!(),
+            }
+        },
+        Err(error) => println!("\n{error}"),
     }
     prompt.clear();
 }
