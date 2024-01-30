@@ -16,6 +16,7 @@ pub mod serial;
 pub mod vga;
 pub mod memory;
 pub mod allocator;
+pub mod repl;
 
 pub fn init() {
     gdt::init();
@@ -30,7 +31,6 @@ pub fn hlt_loop() -> ! {
     }
 }
 
-/// Entry point for `cargo test`
 #[cfg(test)]
 entry_point!(test_kernel_main);
 
