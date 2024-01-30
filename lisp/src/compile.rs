@@ -51,8 +51,7 @@ impl VirtualMachine {
     pub fn new(ast: &[Expr]) -> Self {
         let mut code = Vec::new();
         for expr in ast {
-            let instructions = Self::compile(expr);
-            code.extend(instructions);
+            code.extend(Self::compile(expr));
         }
         Self {
             code,

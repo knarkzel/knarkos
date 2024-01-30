@@ -123,6 +123,15 @@ fn parse_call(input: &str) -> IResult<Expr> {
     sexp(inner)(input)
 }
 
-pub fn parse_expr(input: &str) -> IResult<Expr> {
+fn parse_expr(input: &str) -> IResult<Expr> {
     ws(alt((parse_constant, parse_call)))(input)
 }
+
+pub fn parse(input: &str) -> Result<Vec<Expr>, String> {
+    match many0(parse_expr)(input) {
+        Ok((_, exprs)) => Ok(exprs),
+        Err(error) => Err(format!("Error occurred: {error}")),
+    }
+}
+
+
